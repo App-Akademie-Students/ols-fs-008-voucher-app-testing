@@ -37,3 +37,6 @@ Ohne ausdrückliche Aufforderung:
 Bevorzugtes Vorgehen:
 
 Analyse → Vorschlag → Entscheidung durch den Benutzer → Implementierung
+
+- schreibe alle von mir verwendeten Prompts in einer Datei `docs/prompts.md` mit Zeitstempel und Ergebnis, damit wir die Historie nachvollziehen können
+  und passe diese regelmäßig an, wenn neue Prompts hinzukommen oder sich die Arbeitsweise ändert.
