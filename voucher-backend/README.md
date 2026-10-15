@@ -5,8 +5,8 @@ REST-API zum Erstellen, Abrufen und Einlösen von Gutscheinen. Das Backend ist T
 verschiedene Testarten praktisch umgesetzt werden. Im Mittelpunkt steht nicht die Komplexität,
 sondern ein klarer, gut testbarer Ablauf.
 
-> **Status:** Projekt-Grundgerüst und Domänenmodell stehen. REST-API, Geschäftslogik und Tests
-> sind in Arbeit (siehe [Roadmap](#roadmap)).
+> **Status:** Projekt-Grundgerüst, Domänenmodell, Service sowie Erstellen und Abrufen per REST
+> stehen. Einlösen, weitere Fehlerbehandlung und Tests sind in Arbeit (siehe [Roadmap](#roadmap)).
 
 ## Projektstruktur
 
@@ -27,6 +27,7 @@ ols-fs-008-voucher-app-testing/
 | Persistenz    | Spring Data JPA / Hibernate                   |
 | Datenbank     | H2 (In-Memory, inkl. H2-Console)              |
 | Validierung   | Bean Validation (`spring-boot-starter-validation`) |
+| API-Doku      | springdoc-openapi (Swagger UI)                |
 | Hilfsmittel   | Lombok, Spring Boot DevTools                  |
 | Build         | Maven (Maven Wrapper enthalten)               |
 | Tests         | JUnit 5, Spring Boot Test (`webmvc-test`, `data-jpa-test`, `validation-test`) |
@@ -50,18 +51,35 @@ Ein `Voucher` (Paket `com.example.voucher.model`) besitzt:
 - **Gültige** Gutscheine können **eingelöst** werden.
 - **Abgelaufene** oder **bereits eingelöste** Gutscheine werden abgelehnt.
 
-## REST-API (geplant)
+## REST-API
 
-Die konkreten Pfade sind ein Vorschlag und noch nicht implementiert:
+Implementiert im `VoucherController` (Basispfad `/api/vouchers`):
 
-| Methode | Pfad                           | Beschreibung                          |
-|---------|--------------------------------|---------------------------------------|
-| `POST`  | `/api/vouchers`                | Gutschein erstellen                   |
-| `GET`   | `/api/vouchers/{code}`         | Gutschein per Code abrufen            |
-| `POST`  | `/api/vouchers/{code}/redeem`  | Gutschein einlösen                    |
+| Methode | Pfad                           | Beschreibung                          | Status          |
+|---------|--------------------------------|---------------------------------------|-----------------|
+| `POST`  | `/api/vouchers`                | Gutschein erstellen                   | `201 Created`   |
+| `GET`   | `/api/vouchers/{code}`         | Gutschein per Code abrufen            | `200 OK`        |
+| `POST`  | `/api/vouchers/{code}/redeem`  | Gutschein einlösen                    | *noch offen*    |
 
-Fehlerfälle (z. B. unbekannter Code, abgelaufen, bereits eingelöst) sollen mit sinnvollen
-HTTP-Statuscodes und einer klaren Fehlermeldung beantwortet werden.
+Beispiel zum Erstellen:
+
+```json
+POST /api/vouchers
+{"code": "ABC123", "amount": 50.00, "expirationDate": "2026-12-31"}
+```
+
+Die Antwort (`VoucherResponse`) enthält `id`, `code`, `amount`, `expirationDate` und `redeemed`.
+
+### Fehlerbehandlung
+
+Fehler werden zentral im `GlobalExceptionHandler` als `ProblemDetail` (RFC 9457) beantwortet:
+
+| Fall                   | HTTP-Status     |
+|------------------------|-----------------|
+| Unbekannter Code       | `404 Not Found` |
+
+Weitere Fehlerfälle (abgelaufen, bereits eingelöst, ungültige Eingabe) sind noch nicht
+über eigene Statuscodes abgebildet.
 
 ## Voraussetzungen
 
@@ -79,6 +97,13 @@ HTTP-Statuscodes und einer klaren Fehlermeldung beantwortet werden.
 ```
 
 Das Backend läuft anschließend unter `http://localhost:8080`.
+
+### API-Dokumentation (Swagger)
+
+Die REST-API ist über Swagger UI dokumentiert und kann dort direkt ausprobiert werden:
+
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- OpenAPI-Spezifikation (JSON): `http://localhost:8080/v3/api-docs`
 
 ### H2-Console
 
@@ -123,9 +148,13 @@ Die Einstellungen liegen in `src/main/resources/application.properties`:
 
 - [x] Projekt-Setup (Spring Boot, JPA, H2, Validation)
 - [x] Entity `Voucher`
-- [ ] Repository (Suche per Code)
-- [ ] Service mit Einlöse-Logik und Validierung
-- [ ] REST-Controller inkl. Fehlerbehandlung
-- [ ] Automatisierte Tests (Unit, Repository, Web, Integration)
+- [x] Repository (Suche per Code)
+- [x] Service mit Einlöse-Logik (Prüfung auf eingelöst/abgelaufen)
+- [x] REST-Controller: Erstellen und Abrufen, `404` bei unbekanntem Code
+- [ ] REST-Endpunkt zum Einlösen (`POST /api/vouchers/{code}/redeem`)
+- [ ] Fehlerbehandlung für abgelaufen/bereits eingelöst (derzeit `IllegalStateException` im Service) und Eingabevalidierung
+- [x] Automatisierte Tests: Unit (Service), Web (Controller), Integration (Service)
+- [ ] Repository-Tests (`@DataJpaTest`) und API-Integrationstests von Controller bis Datenbank
+- [x] Swagger UI (springdoc-openapi)
 - [ ] CORS-Konfiguration für das React-Frontend
 - [ ] Frontend (`voucher-frontend`) und E2E-Tests
