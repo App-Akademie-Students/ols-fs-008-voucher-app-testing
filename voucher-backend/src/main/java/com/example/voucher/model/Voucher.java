@@ -27,5 +27,19 @@ public class Voucher {
     private BigDecimal amount;
     private LocalDate expirationDate;
     private boolean redeemed;
+    public Voucher(
+            String code,
+            BigDecimal amount,
+            LocalDate expirationDate,
+            boolean redeemed
+    ) {
+        this.code = code;
+        this.amount = amount;
+        this.expirationDate = expirationDate;
+        this.redeemed = redeemed;
+    }
 
+    public void redeem() {
+        this.redeemed = true;
+    }
 }

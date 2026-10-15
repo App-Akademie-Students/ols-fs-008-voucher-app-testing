@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -22,11 +22,11 @@ class VoucherServiceTest {
     private VoucherService voucherService;
 
     @Test
-    void shouldReturnCreatedVoucherWhenCodeExists() {
+    void shouldReturnVoucherWhenCodeExists() {//Fix: Rename Create to  Return
         Voucher voucher = new Voucher();
 
         voucher.setCode("ABC123");
-        when(voucherRepository.save(voucher)).thenReturn(voucher);// FIXME
+        when(voucherRepository.save(voucher)).thenReturn(voucher);// FIXME keine Datenbank - save() sollte nicht aufgerufen werden, da wir nur den Code testen wollen. Stattdessen sollten wir die Logik der VoucherService-Klasse testen, die den Voucher erstellt und zurückgibt.
 
     }
 

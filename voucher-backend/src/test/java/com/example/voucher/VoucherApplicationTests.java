@@ -11,7 +11,7 @@ class VoucherApplicationTests {
 
 	@Test
 	void contextLoads() {
-        Voucher v = new Voucher(1L, "TESTCODE", null, null, false);
+
 	}
 
 
