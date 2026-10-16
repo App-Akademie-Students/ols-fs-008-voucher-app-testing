@@ -175,4 +175,54 @@ class VoucherControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.expirationDate").doesNotExist());
     }
+
+    // ---- POST /api/vouchers/{code}/redeem ----
+
+    @Test
+    @DisplayName("POST redeem should return 200 and redeemed voucher")
+    void shouldRedeemVoucherAndReturn200() throws Exception {
+        Voucher redeemed = savedVoucher();
+        redeemed.redeem();
+        when(voucherService.redeemVoucher("ABC123")).thenReturn(redeemed);
+
+        mockMvc.perform(post("/api/vouchers/ABC123/redeem"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.code").value("ABC123"))
+                .andExpect(jsonPath("$.redeemed").value(true));
+
+        verify(voucherService).redeemVoucher("ABC123");
+    }
+
+    @Test
+    @DisplayName("POST redeem should return 404 when voucher not found")
+    void shouldReturn404WhenRedeemingUnknownVoucher() throws Exception {
+        when(voucherService.redeemVoucher("UNKNOWN")).thenThrow(new VoucherNotFoundException("UNKNOWN"));
+
+        mockMvc.perform(post("/api/vouchers/UNKNOWN/redeem"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.detail").value("Voucher not found: UNKNOWN"));
+    }
+
+    @Test
+    @DisplayName("POST redeem should return 409 when voucher already redeemed")
+    void shouldReturn409WhenVoucherAlreadyRedeemed() throws Exception {
+        when(voucherService.redeemVoucher("ABC123"))
+                .thenThrow(new IllegalStateException("Voucher already redeemed"));
+
+        mockMvc.perform(post("/api/vouchers/ABC123/redeem"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail").value("Voucher already redeemed"));
+    }
+
+    @Test
+    @DisplayName("POST redeem should return 409 when voucher expired")
+    void shouldReturn409WhenVoucherExpired() throws Exception {
+        when(voucherService.redeemVoucher("ABC123"))
+                .thenThrow(new IllegalStateException("Voucher expired"));
+
+        mockMvc.perform(post("/api/vouchers/ABC123/redeem"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail").value("Voucher expired"));
+    }
 }

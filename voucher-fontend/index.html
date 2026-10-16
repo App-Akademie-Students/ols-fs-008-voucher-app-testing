@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gutschein einlösen</title>
+  </head>
+  <body>
+    <header>
+      <h1>Gutschein einlösen</h1>
+      <nav aria-label="Bereiche">
+        <a href="/" aria-current="page">Kunde</a>
+        <a href="/admin.html">Admin</a>
+      </nav>
+    </header>
+    <main>
+      <form id="lookup-form">
+        <label for="code">Code</label>
+        <input id="code" name="code" type="text" autocomplete="off" />
+        <button type="submit">Gutschein abrufen</button>
+      </form>
+
+      <p id="error" role="alert" hidden></p>
+
+      <section id="voucher-section" aria-labelledby="voucher-heading" hidden>
+        <h2 id="voucher-heading">Gutschein</h2>
+        <dl id="voucher"></dl>
+        <button id="redeem-button" type="button">Gutschein einlösen</button>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

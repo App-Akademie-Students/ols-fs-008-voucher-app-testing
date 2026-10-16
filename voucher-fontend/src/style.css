@@ -1,0 +1,36 @@
+body {
+  font-family: system-ui, sans-serif;
+  max-width: 36rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+nav a {
+  margin-right: 1rem;
+}
+
+form {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+button {
+  justify-self: start;
+  padding: 0.4rem 1rem;
+}
+
+[role="alert"] {
+  color: #b00020;
+  background: #fdecea;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+}
+
+dt {
+  font-weight: bold;
+}
+
+dd {
+  margin: 0 0 0.5rem;
+}

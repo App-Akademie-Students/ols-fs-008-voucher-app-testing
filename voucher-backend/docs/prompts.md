@@ -102,3 +102,61 @@ Jeweils mit Kontext und Ergebnis.
 - **Kontext:** Die App sollte lokal laufen, um Swagger UI zu nutzen.
 - **Ergebnis:** App per `mvnw spring-boot:run` gestartet. Swagger UI unter `http://localhost:8080/swagger-ui.html`, OpenAPI-JSON unter `/v3/api-docs`.
 
+## Session 16.10.2026 (redeem im Controller)
+
+## 1. redeemVoucher im Controller ergänzen
+
+> Ergänze die Voucher Controller Um eine fehlende Funktion - redeemVoucher /Service benutzen
+
+- **Kontext:** `VoucherService.redeemVoucher(code)` existierte bereits, im `VoucherController` fehlte der Endpunkt.
+- **Ergebnis:** `POST /api/vouchers/{code}/redeem` in `VoucherController.redeem` ergänzt (liefert `VoucherResponse`, 200). Hinweis: `IllegalStateException` (bereits eingelöst/abgelaufen) ist im `GlobalExceptionHandler` noch nicht behandelt, führt aktuell zu 500.
+
+## 2. IllegalStateException behandeln
+
+> ja, IllegalStateException im GlobalExceptionHandler behandeln
+
+- **Kontext:** Zustimmung zu meinem Vorschlag aus Prompt 1.
+- **Ergebnis:** `GlobalExceptionHandler.handleIllegalState` ergänzt: `IllegalStateException` (bereits eingelöst/abgelaufen) liefert jetzt `409 Conflict` als `ProblemDetail`.
+
+## 3. Tests ausführen
+
+> Tests ausführen
+
+- **Kontext:** Prüfung nach Ergänzung von `redeem` und dem `IllegalStateException`-Handler.
+- **Ergebnis:** `./mvnw test`: 20 Tests, 0 Fehler, 0 Failures, BUILD SUCCESS.
+
+## 4. VoucherControllerTest für redeem
+
+> Ja, VoucherControllerTest für redeem implementieren
+
+- **Kontext:** Zustimmung zu meinem Testvorschlag (Happy Path, 404, 409).
+- **Ergebnis:** 4 Tests in der bestehenden `VoucherControllerTest` ergänzt: 200 mit `redeemed=true`, 404 unbekannter Code, 409 bereits eingelöst, 409 abgelaufen. `./mvnw test`: 24 Tests grün.
+
+## 5. README an redeem-Endpunkt anpassen
+
+> README an den redeem-Endpunkt anpassen
+
+- **Kontext:** Die README markierte `redeem` noch als offen und die `409`-Fälle als nicht abgebildet.
+- **Ergebnis:** Status-Hinweis, Endpunkt-Tabelle (`200 OK`), Einlöse-Beispiel, Fehlertabelle (`409` für eingelöst/abgelaufen) und Roadmap aktualisiert. Neuer offener Punkt: Eingabevalidierung beim Erstellen.
+
+## 6. CORS in der Roadmap abhaken
+
+> ja, CORS in der Roadmap abhaken
+
+- **Kontext:** Zustimmung zu meinem Hinweis, dass `@CrossOrigin(origins = "http://localhost:3000")` bereits am `VoucherController` steht.
+- **Ergebnis:** Roadmap-Punkt „CORS-Konfiguration für das React-Frontend“ in der README abgehakt.
+
+
+## 7. CORS für den Vite-Dev-Server
+
+> A, B, C (C: Backend-CORS auf http://localhost:5173 erweitern)
+
+- **Kontext:** Das Frontend (Vite) läuft auf Port 5173, das Backend erlaubte nur Port 3000.
+- **Ergebnis:** `@CrossOrigin` am `VoucherController` um `http://localhost:5173` erweitert, README-Roadmap angepasst. Tests nicht ausgeführt.
+
+## 8. Ordnername und Backend-README bereinigen (E)
+
+> erst e, dann d
+
+- **Kontext:** Ordner `voucher-fontend` sollte in `voucher-frontend` umbenannt werden; Backend-README nannte React und `ddl-auto=update`.
+- **Ergebnis:** README korrigiert (Vite/TypeScript statt React, `create-drop`). Umbenennung des Ordners scheiterte mit „Permission denied“ (Ordner ist geöffnet/gesperrt) und muss manuell erfolgen.

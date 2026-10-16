@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gutschein anlegen</title>
+  </head>
+  <body>
+    <header>
+      <h1>Gutschein anlegen</h1>
+      <nav aria-label="Bereiche">
+        <a href="/">Kunde</a>
+        <a href="/admin.html" aria-current="page">Admin</a>
+      </nav>
+    </header>
+    <main>
+      <form id="create-form" novalidate>
+        <label for="code">Code</label>
+        <input id="code" name="code" type="text" autocomplete="off" />
+
+        <label for="amount">Betrag</label>
+        <input id="amount" name="amount" type="number" step="0.01" min="0" />
+
+        <label for="expiration-date">Ablaufdatum</label>
+        <input id="expiration-date" name="expirationDate" type="date" />
+
+        <button type="submit">Gutschein anlegen</button>
+      </form>
+
+      <p id="error" role="alert" hidden></p>
+
+      <section id="voucher-section" aria-labelledby="voucher-heading" hidden>
+        <h2 id="voucher-heading">Angelegter Gutschein</h2>
+        <dl id="voucher"></dl>
+      </section>
+    </main>
+    <script type="module" src="/src/admin.ts"></script>
+  </body>
+</html>

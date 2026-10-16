@@ -1,12 +1,12 @@
 # Voucher Backend – Gutscheine verwalten und einlösen
 
 REST-API zum Erstellen, Abrufen und Einlösen von Gutscheinen. Das Backend ist Teil der
-**Voucher App**, einer kleinen Full-Stack-Beispielanwendung, an der Spring Boot, React und
+**Voucher App**, einer kleinen Full-Stack-Beispielanwendung, an der Spring Boot, ein Vite-/TypeScript-Frontend und
 verschiedene Testarten praktisch umgesetzt werden. Im Mittelpunkt steht nicht die Komplexität,
 sondern ein klarer, gut testbarer Ablauf.
 
-> **Status:** Projekt-Grundgerüst, Domänenmodell, Service sowie Erstellen und Abrufen per REST
-> stehen. Einlösen, weitere Fehlerbehandlung und Tests sind in Arbeit (siehe [Roadmap](#roadmap)).
+> **Status:** Projekt-Grundgerüst, Domänenmodell, Service sowie Erstellen, Abrufen und Einlösen
+> per REST stehen. Eingabevalidierung und weitere Tests sind in Arbeit (siehe [Roadmap](#roadmap)).
 
 ## Projektstruktur
 
@@ -15,7 +15,7 @@ Backend und Frontend liegen als getrennte Projekte nebeneinander in einem überg
 ```
 ols-fs-008-voucher-app-testing/
 ├── voucher-backend/     <- dieses Projekt (Spring Boot)
-└── voucher-frontend/    <- React-Frontend (folgt, parallel zum Backend)
+└── voucher-frontend/    <- Vite-/TypeScript-Frontend (parallel zum Backend)
 ```
 
 ## Tech-Stack
@@ -59,7 +59,7 @@ Implementiert im `VoucherController` (Basispfad `/api/vouchers`):
 |---------|--------------------------------|---------------------------------------|-----------------|
 | `POST`  | `/api/vouchers`                | Gutschein erstellen                   | `201 Created`   |
 | `GET`   | `/api/vouchers/{code}`         | Gutschein per Code abrufen            | `200 OK`        |
-| `POST`  | `/api/vouchers/{code}/redeem`  | Gutschein einlösen                    | *noch offen*    |
+| `POST`  | `/api/vouchers/{code}/redeem`  | Gutschein einlösen                    | `200 OK`        |
 
 Beispiel zum Erstellen:
 
@@ -70,6 +70,12 @@ POST /api/vouchers
 
 Die Antwort (`VoucherResponse`) enthält `id`, `code`, `amount`, `expirationDate` und `redeemed`.
 
+Beispiel zum Einlösen (ohne Request-Body, liefert den Gutschein mit `redeemed: true`):
+
+```
+POST /api/vouchers/ABC123/redeem
+```
+
 ### Fehlerbehandlung
 
 Fehler werden zentral im `GlobalExceptionHandler` als `ProblemDetail` (RFC 9457) beantwortet:
@@ -77,9 +83,12 @@ Fehler werden zentral im `GlobalExceptionHandler` als `ProblemDetail` (RFC 9457)
 | Fall                   | HTTP-Status     |
 |------------------------|-----------------|
 | Unbekannter Code       | `404 Not Found` |
+| Bereits eingelöst      | `409 Conflict`  |
+| Abgelaufen             | `409 Conflict`  |
 
-Weitere Fehlerfälle (abgelaufen, bereits eingelöst, ungültige Eingabe) sind noch nicht
-über eigene Statuscodes abgebildet.
+Der Service wirft in den beiden `409`-Fällen eine `IllegalStateException`, die der
+`GlobalExceptionHandler` auf `409 Conflict` abbildet. Ungültige Eingabe (Validierung) ist noch
+nicht über eigene Statuscodes abgebildet.
 
 ## Voraussetzungen
 
@@ -140,7 +149,7 @@ Die End-to-End-Tests über komplette User Journeys entstehen zusammen mit dem Fr
 Die Einstellungen liegen in `src/main/resources/application.properties`:
 
 - H2 In-Memory-Datenbank `voucherdb`
-- `spring.jpa.hibernate.ddl-auto=update`
+- `spring.jpa.hibernate.ddl-auto=create-drop`
 - SQL-Ausgabe aktiviert (`spring.jpa.show-sql=true`)
 - H2-Console unter `/h2-console` aktiviert
 
@@ -151,10 +160,11 @@ Die Einstellungen liegen in `src/main/resources/application.properties`:
 - [x] Repository (Suche per Code)
 - [x] Service mit Einlöse-Logik (Prüfung auf eingelöst/abgelaufen)
 - [x] REST-Controller: Erstellen und Abrufen, `404` bei unbekanntem Code
-- [ ] REST-Endpunkt zum Einlösen (`POST /api/vouchers/{code}/redeem`)
-- [ ] Fehlerbehandlung für abgelaufen/bereits eingelöst (derzeit `IllegalStateException` im Service) und Eingabevalidierung
+- [x] REST-Endpunkt zum Einlösen (`POST /api/vouchers/{code}/redeem`)
+- [x] Fehlerbehandlung für abgelaufen/bereits eingelöst (`IllegalStateException` → `409 Conflict`)
+- [ ] Eingabevalidierung beim Erstellen
 - [x] Automatisierte Tests: Unit (Service), Web (Controller), Integration (Service)
 - [ ] Repository-Tests (`@DataJpaTest`) und API-Integrationstests von Controller bis Datenbank
 - [x] Swagger UI (springdoc-openapi)
-- [ ] CORS-Konfiguration für das React-Frontend
+- [x] CORS-Konfiguration für das Frontend (`@CrossOrigin` für `http://localhost:3000` und den Vite-Dev-Server `http://localhost:5173` am `VoucherController`)
 - [ ] Frontend (`voucher-frontend`) und E2E-Tests
