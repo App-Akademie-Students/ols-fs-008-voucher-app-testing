@@ -50,3 +50,10 @@ Fortlaufende Dokumentation der AI-Prompts für das Frontend.
 
 - **Kontext:** Nach dem Aufteilen und Ergänzen der E2E-Tests.
 - **Ergebnis:** `README.md`: Status-Hinweis (Tests vorhanden) und Testtabelle mit Abdeckung. `docs/requirements.md`: Status von FE-01 und FE-02 um die E2E-Abdeckung ergänzt. `CLAUDE.md` unverändert.
+
+## 8. Gemeinsame README im Hauptverzeichnis
+
+> Erstelle im Hauptverzeichnis eine gemeinsame README für Frontend und Backend. Mit den wichtigsten Informationen.
+
+- **Kontext:** Dokumentationsaufgabe, kein Code geändert.
+- **Ergebnis:** `README.md` im Repository-Wurzelverzeichnis (außerhalb von `voucher-fontend/`): Überblick, Schnellstart für Backend und Frontend, URLs, REST-API, Tests, Konfiguration, Projektstruktur und Verweise auf die Einzel-READMEs.
