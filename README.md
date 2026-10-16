@@ -95,3 +95,16 @@ ols-fs-008-voucher-app-testing/
 
 - Backend: [voucher-backend/README.md](voucher-backend/README.md), [Anforderungen](voucher-backend/docs/requirements.md), [Prompts](voucher-backend/docs/prompts.md)
 - Frontend: [voucher-fontend/README.md](voucher-fontend/README.md), [Anforderungen](voucher-fontend/docs/requirements.md), [Prompts](voucher-fontend/docs/prompts.md)
+
+
+## E2E Playwright Test Example
+```
+import { test, expect } from '@playwright/test';
+
+test('Startseite liefert HTTP 200', async ({ page }) => {
+  const response = await page.goto('http://localhost:5173');
+
+  expect(response?.status()).toBe(200);
+});
+
+```
